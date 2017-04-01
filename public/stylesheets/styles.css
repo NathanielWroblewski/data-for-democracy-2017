@@ -27,6 +27,15 @@ html, body {
   z-index: 10;
 }
 
+.back {
+  cursor: pointer;
+  color: #aaa;
+}
+
+.back:hover {
+  color: #444;
+}
+
 .subtitle {
   margin-top: 0;
   color: #aaa;
