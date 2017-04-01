@@ -113,6 +113,8 @@ select {
 
 .bar {
   fill: steelblue;
+  stroke: #fff;
+  stroke-width: 1.5px;
 }
 
 .axis--x path {
