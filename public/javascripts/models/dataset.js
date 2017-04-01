@@ -25,6 +25,7 @@ class Dataset {
       this.data[this.year].links
         .map(contribution => contribution.target.id || contribution.target)
         .filter(target => target.includes(' (Recipient)'))
+        .sort()
       )
     ]
   }

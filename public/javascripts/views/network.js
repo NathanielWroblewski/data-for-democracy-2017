@@ -12,6 +12,7 @@ class Network {
   }
 
   updateYear (e) {
+    this.model.set('recipient', null)
     this.model.set('year', e.target.value)
   }
 
@@ -69,7 +70,9 @@ class Network {
     const caption = document.querySelector('.caption')
 
     caption.innerHTML = `
-      ${this.titleize(d.source.id)} gave $${d.value} to ${this.titleize(d.target.id)}
+      ${this.templateName(d.source)} gave
+      <span class="money">$${d.value.toLocaleString()}</span>
+      to ${this.templateName(d.target)}
     `
   }
 
@@ -91,7 +94,13 @@ class Network {
   }
 
   showNode (d) {
-    document.querySelector('.caption').innerHTML = `${this.titleize(d.id)}`
+    document.querySelector('.caption').innerHTML = this.templateName(d)
+  }
+
+  templateName (d) {
+    const [name, role] = this.titleize(d.id).split(/\s(?=\()/)
+
+    return `<span class="name">${name}</span> ${role}`
   }
 
   hideCaption (d) {
@@ -112,9 +121,9 @@ class Network {
         <svg></svg>
       </div>
       <div class="content">
-        <h1 class="title">Lobbyist Connections</h1>
-        <p class="subtitle">How are funders and City of Chicago elected officials connected through lobbyists?</p>
-        <p class="label">Year <select class="year">
+        <h1 class="title overlay">Lobbyist Connections</h1>
+        <p class="subtitle overlay">How are funders and City of Chicago elected officials connected through lobbyists?</p>
+        <p class="label overlay">Year <select class="year">
     `
     YEARS.reduce((memo, year) => {
       const selected = year === this.model.year ? 'selected' : ''
@@ -136,7 +145,7 @@ class Network {
 
     html += `
         </select></p>
-        <p class="caption"></p>
+        <p class="caption overlay"></p>
       </div>
     `
 
