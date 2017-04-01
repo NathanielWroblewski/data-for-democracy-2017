@@ -1,5 +1,6 @@
 require 'csv'
 require 'json'
+require 'active_support/inflector'
 
 TIME_FRAME = 2012..2016
 contributions = {}
@@ -17,9 +18,9 @@ end
 
 CSV.foreach('./flattened.csv', headers: true, header_converters: :symbol) do |row|
   year = row[:date].split('/').last.to_i
-  recipient = "#{row[:recipient]} (Recipient)"
-  lobbyist = "#{row[:lobbyist]} (Lobbyist)"
-  employer = "#{row[:employer]} (Funder)"
+  recipient = "#{row[:recipient].titleize} (Recipient)"
+  lobbyist = "#{row[:lobbyist].titleize} (Lobbyist)"
+  employer = "#{row[:employer].titleize} (Funder)"
   amount = row[:amount].delete('$').delete(',').to_i
 
   if TIME_FRAME.include?(year) && amount > 0 && lobbyist && employer

@@ -54,8 +54,24 @@ svg {
 
 .links line {
   stroke: #999;
-  stroke-width: 1px;
+  /*stroke-width: 1px;*/
   stroke-opacity: 0.6;
+}
+
+@keyframes bigify {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(2);
+  }
+}
+
+.nodes circle:hover {
+  transform: scale(2);
+  animation-duration: 0.5s;
+  animation-name: bigify;
+  transform-origin: center center;
 }
 
 .nodes circle {

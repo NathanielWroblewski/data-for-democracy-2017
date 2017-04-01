@@ -35,7 +35,7 @@ class Network {
       .selectAll('line')
       .data(network.links)
       .enter().append('line')
-      .attr('stroke-width', d => Math.sqrt(d.value))
+      .attr('stroke-width', d => Math.sqrt(d.value / 1000))
       .on('mouseover', (d) => this.showConnection(d))
       // .style("marker-end",  "url(#suit)");
     const node = svg.append('g')
