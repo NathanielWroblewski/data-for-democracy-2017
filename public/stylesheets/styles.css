@@ -9,8 +9,8 @@ html, body {
 }
 
 .content {
-  width: 100%;
-  height: 100%;
+  width: 800px;
+  height: 600px;
   margin: 0 auto;
   padding-top: 50px;
   position: relative;
@@ -20,6 +20,12 @@ html, body {
   margin-bottom: 2px;
 }
 
+svg {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
 .subtitle {
   margin-top: 0;
   color: #aaa;
@@ -27,10 +33,17 @@ html, body {
 
 .links line {
   stroke: #999;
-  stroke-opacity: 0.1;
+  stroke-width: 1px;
+  stroke-opacity: 0.6;
 }
 
 .nodes circle {
   stroke: #fff;
   stroke-width: 1.5px;
+}
+
+.caption {
+  position: fixed;
+  bottom: 50px;
+  color: #aaa;
 }
