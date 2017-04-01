@@ -101,3 +101,15 @@ svg {
 select {
   max-width: 150px;
 }
+
+.bar {
+  fill: steelblue;
+}
+
+.axis--x path {
+  display: none;
+}
+
+.bar-labels text {
+  font-size: 8px;
+}
