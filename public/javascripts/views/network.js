@@ -128,6 +128,11 @@ class Network {
     return string.split(' ').map(word => this.capitalize(word)).join(' ')
   }
 
+  back () {
+    this.profile = null;
+    this.render()
+  }
+
   networkTemplate () {
     let html = `
       <div class="svg-container">
@@ -176,12 +181,22 @@ class Network {
   }
 
   profileTemplate () {
+    const { id, group } = this.profile
+    const verb = group === 1 ? 'to' : 'from'
+
     return `
       <div class="content">
-        <h1 class="title overlay">${this.profile.id}</h1>
+        <h1 class="title overlay">Contributions ${verb} ${this.stripTitle(id)}</h1>
+        <p class="back">&#8678; Back</p>
         <svg height="400" width="800"></svg>
       </div>
     `
+  }
+
+  stripTitle (id) {
+    return id.replace(' (Recipient)', '')
+      .replace(' (Lobbyist)', '')
+      .replace(' (Funder)', '')
   }
 
   chartBars (data) {
@@ -194,11 +209,7 @@ class Network {
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`)
 
-    x.domain(data.map(d => {
-      return d.x.replace(' (Recipient)', '')
-        .replace(' (Lobbyist)', '')
-        .replace(' (Funder)', '')
-    }))
+    x.domain(data.map(d => this.stripTitle(d.x)))
     y.domain([0, d3.max(data, d => d.y)])
 
     g.append('g')
@@ -253,6 +264,8 @@ class Network {
     } else {
       this.chartBars(this.model.getContributionsFrom(id))
     }
+
+    this.el.querySelector('.back').addEventListener('click', e => this.back());
   }
 
   render () {
