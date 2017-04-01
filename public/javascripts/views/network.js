@@ -237,7 +237,7 @@ class Network {
       .data(data)
       .enter().append('rect')
         .attr('class', 'bar')
-        .attr('x', d => x(d.x))
+        .attr('x', (d, i) => x.bandwidth() * i)
         .attr('y', d => y(d.y))
         .attr('width', x.bandwidth())
         .attr('height', d => height - y(d.y))
