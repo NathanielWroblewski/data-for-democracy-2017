@@ -17,6 +17,8 @@ TIME_FRAME.each do |year|
 end
 
 CSV.foreach('./flattened.csv', headers: true, header_converters: :symbol) do |row|
+  next if row[:recipient] == 'NA'
+
   year = row[:date].split('/').last.to_i
   recipient = "#{row[:recipient].titleize} (Recipient)"
   lobbyist = "#{row[:lobbyist].titleize} (Lobbyist)"

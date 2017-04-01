@@ -186,7 +186,7 @@ class Network {
 
   chartBars (data) {
     const svg = d3.select('svg')
-    const margin = { top: 20, right: 20, bottom: 30, left: 40 }
+    const margin = { top: 20, right: 20, bottom: 80, left: 40 }
     const width = +svg.attr('width') - margin.left - margin.right
     const height = +svg.attr('height') - margin.top - margin.bottom
     const x = d3.scaleBand().rangeRound([0, width]).padding(0.1)
@@ -194,13 +194,23 @@ class Network {
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`)
 
-    x.domain(data.map(d => d.x.replace(' (Recipient)', '')))
+    x.domain(data.map(d => {
+      return d.x.replace(' (Recipient)', '')
+        .replace(' (Lobbyist)', '')
+        .replace(' (Funder)', '')
+    }))
     y.domain([0, d3.max(data, d => d.y)])
 
     g.append('g')
       .attr('class', 'axis axis--x')
-      .attr('transform', `translate(0,${height})`)
+      .attr('transform', `translate(0,${height + 20})`)
       .call(d3.axisBottom(x))
+      .selectAll('text')
+        .attr('y', 0)
+        .attr('x', 9)
+        .attr('dy', '.35em')
+        .attr('transform', 'rotate(90)')
+        .style('text-anchor', 'start');
 
     g.append('g')
       .attr('class', 'axis axis--y')
@@ -220,6 +230,17 @@ class Network {
         .attr('y', d => y(d.y))
         .attr('width', x.bandwidth())
         .attr('height', d => height - y(d.y))
+
+    // g.selectAll('.bar-labels')
+    //   .data(data)
+    //   .enter().append('text')
+    //     .attr('class', 'bar-label')
+    //     .attr('width', x.bandwidth())
+    //     .attr('height', height)
+    //     .attr('x', (d, i) => i * x.bandwidth() + margin.left)
+    //     .attr('y', height)
+    //     .attr('text-anchor', 'end')
+    //     .text(d => d.y)
   }
 
   renderProfile () {

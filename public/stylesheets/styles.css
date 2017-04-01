@@ -109,3 +109,7 @@ select {
 .axis--x path {
   display: none;
 }
+
+.bar-labels text {
+  font-size: 8px;
+}
