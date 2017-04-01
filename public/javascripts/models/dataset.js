@@ -30,6 +30,18 @@ class Dataset {
     ]
   }
 
+  getContributionsTo (recipient) {
+    return this.data[this.year].links
+      .filter(link => link.target.id.includes(recipient))
+      .map(link => ({ x: link.source.id, y: link.value }))
+  }
+
+  getContributionsFrom (funder) {
+    return this.data[this.year].links
+      .filter(link => link.source.id.includes(funder))
+      .map(link => ({ x: link.target.id, y: link.value }))
+  }
+
   filter (data) {
     const lobbyistLinks = data.links.filter(contribution => contribution.target.id === this.recipient)
     const lobbyists = lobbyistLinks.map(contribution => contribution.source.id)

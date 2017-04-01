@@ -101,3 +101,11 @@ svg {
 select {
   max-width: 150px;
 }
+
+.bar {
+  fill: steelblue;
+}
+
+.axis--x path {
+  display: none;
+}

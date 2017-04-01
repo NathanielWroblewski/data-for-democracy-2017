@@ -7,8 +7,17 @@ class Network {
   constructor ({ el, model }) {
     this.el = el
     this.model = model
+    this.profile = null
 
     this.model.on('change', () => this.render())
+  }
+
+  toggleProfile (d) {
+    this.profile = {
+      id: d.id,
+      group: d.group
+    }
+    this.render()
   }
 
   updateYear (e) {
@@ -46,22 +55,26 @@ class Network {
       .enter().append('circle')
       .attr('r', 5)
       .attr('fill', d => color(d.group))
-      .call(d3.drag()
-          .on('start', this.dragstarted)
-          .on('drag', this.dragged)
-          .on('end', this.dragended))
+      // .call(d3.drag()
+      //     .on('start', this.dragstarted)
+      //     .on('drag', this.dragged)
+      //     .on('end', this.dragended))
       .on('mouseover', (d) => this.showNode(d))
       .on('mouseout', this.hideCaption)
 
+    this.simulation = simulation
+
     simulation.nodes(network.nodes).on('tick', () => {
-      link
-        .attr('x1', d => d.source.x)
-        .attr('y1', d => d.source.y)
-        .attr('x2', d => d.target.x)
-        .attr('y2', d => d.target.y)
-      node
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
+      if (this.simulation) {
+        link
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y)
+        node
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+      }
     })
     simulation.force('link').links(network.links)
   }
@@ -76,22 +89,22 @@ class Network {
     `
   }
 
-  dragstarted (d) {
-    if (!d3.event.active) simulation.alphaTarget(0.3).restart()
-    d.fx = d.x
-    d.fy = d.y
-  }
+  // dragstarted (d) {
+  //   if (!d3.event.active) simulation.alphaTarget(0.3).restart()
+  //   d.fx = d.x
+  //   d.fy = d.y
+  // }
 
-  dragged (d) {
-    d.fx = d3.event.x
-    d.fy = d3.event.y
-  }
+  // dragged (d) {
+  //   d.fx = d3.event.x
+  //   d.fy = d3.event.y
+  // }
 
-  dragended (d) {
-    if (!d3.event.active) simulation.alphaTarget(0)
-    d.fx = null
-    d.fy = null
-  }
+  // dragended (d) {
+  //   if (!d3.event.active) simulation.alphaTarget(0)
+  //   d.fx = null
+  //   d.fy = null
+  // }
 
   showNode (d) {
     document.querySelector('.caption').innerHTML = this.templateName(d)
@@ -115,7 +128,7 @@ class Network {
     return string.split(' ').map(word => this.capitalize(word)).join(' ')
   }
 
-  template () {
+  networkTemplate () {
     let html = `
       <div class="svg-container">
         <svg></svg>
@@ -152,11 +165,77 @@ class Network {
     return html
   }
 
-  render () {
-    this.el.innerHTML = this.template()
+  renderNetwork () {
+    this.el.innerHTML = this.networkTemplate()
     this.graph(this.model.toJSON())
-    this.el.querySelector('.year').addEventListener('change', e => this.updateYear(e));
-    this.el.querySelector('.recipient').addEventListener('change', e => this.updateRecipient(e));
+    this.el.querySelector('.year')
+      .addEventListener('change', e => this.updateYear(e));
+    this.el.querySelector('.recipient')
+      .addEventListener('change', e => this.updateRecipient(e));
+    d3.selectAll('.nodes circle').on('click', d => this.toggleProfile(d));
+  }
+
+  profileTemplate () {
+    return `
+      <div class="content">
+        <h1 class="title overlay">${this.profile.id}</h1>
+        <svg height="400" width="800"></svg>
+      </div>
+    `
+  }
+
+  chartBars (data) {
+    const svg = d3.select('svg')
+    const margin = { top: 20, right: 20, bottom: 30, left: 40 }
+    const width = +svg.attr('width') - margin.left - margin.right
+    const height = +svg.attr('height') - margin.top - margin.bottom
+    const x = d3.scaleBand().rangeRound([0, width]).padding(0.1)
+    const y = d3.scaleLinear().rangeRound([height, 0])
+    const g = svg.append('g')
+      .attr('transform', `translate(${margin.left},${margin.top})`)
+
+    x.domain(data.map(d => d.x.replace(' (Recipient)', '')))
+    y.domain([0, d3.max(data, d => d.y)])
+
+    g.append('g')
+      .attr('class', 'axis axis--x')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x))
+
+    g.append('g')
+      .attr('class', 'axis axis--y')
+      .call(d3.axisLeft(y).ticks(10))
+      .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '0.71em')
+        .attr('text-anchor', 'end')
+        .text('$');
+
+    g.selectAll('.bar')
+      .data(data)
+      .enter().append('rect')
+        .attr('class', 'bar')
+        .attr('x', d => x(d.x))
+        .attr('y', d => y(d.y))
+        .attr('width', x.bandwidth())
+        .attr('height', d => height - y(d.y))
+  }
+
+  renderProfile () {
+    const { id, group } = this.profile;
+
+    this.el.innerHTML = this.profileTemplate()
+
+    if (group === 1) {
+      this.chartBars(this.model.getContributionsTo(id))
+    } else {
+      this.chartBars(this.model.getContributionsFrom(id))
+    }
+  }
+
+  render () {
+    this.profile ? this.renderProfile() : this.renderNetwork()
 
     return this
   }
