@@ -10,12 +10,12 @@ links = []
 
 CSV.foreach('./flattened.csv', headers: true, header_converters: :symbol) do |row|
   year = row[:date].split('/').last.to_i
+  recipient = row[:recipient] + ' - Recipient'
+  lobbyist = row[:lobbyist] + ' - Lobbyist'
+  employer = row[:employer] + ' - Employer'
+  amount = row[:amount].delete('$').delete(',').to_i
 
-  if year == 2016
-    recipient = row[:recipient]
-    lobbyist = row[:lobbyist]
-    employer = row[:employer]
-
+  if year == 2016 && amount > 0
     recipients[recipient] = true
     lobbyists[lobbyist] = true
     employers[employer] = true
@@ -23,13 +23,13 @@ CSV.foreach('./flattened.csv', headers: true, header_converters: :symbol) do |ro
     links << {
       source: lobbyist,
       target: recipient,
-      value: row[:amount].delete('$').delete(',').to_i
+      value: amount
     }
 
     links << {
       source: employer,
       target: lobbyist,
-      value: 1
+      value: amount
     }
   end
 end
@@ -46,7 +46,7 @@ employers.each do |key, value|
   nodes << { id: key, group: 3 }
 end
 
-File.open('graph.json', 'w') do |file|
+File.open('./public/javascripts/datasets/data.json', 'w') do |file|
   file.write({
     nodes: nodes,
     links: links

@@ -6,7 +6,7 @@ var color = d3.scaleOrdinal(d3.schemeCategory20);
 
 var simulation = d3.forceSimulation()
     .force("link", d3.forceLink().id(function(d) { return d.id; }))
-    .force("charge", d3.forceManyBody())
+    .force("charge", d3.forceManyBody().distanceMax(70))
     .force("center", d3.forceCenter(width / 2, height / 2));
 
 d3.json("./public/javascripts/datasets/data.json", function(error, graph) {
@@ -17,7 +17,9 @@ d3.json("./public/javascripts/datasets/data.json", function(error, graph) {
     .selectAll("line")
     .data(graph.links)
     .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+      .attr("stroke-width", function(d) { return Math.sqrt(d.value); })
+      .on('mouseover', showConnection)
+      // .style("marker-end",  "url(#suit)");
 
   var node = svg.append("g")
       .attr("class", "nodes")
@@ -29,10 +31,27 @@ d3.json("./public/javascripts/datasets/data.json", function(error, graph) {
       .call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
-          .on("end", dragended));
+          .on("end", dragended))
+      .on('mouseover', showNode)
+      .on('mouseout', hideCaption);
 
   node.append("title")
       .text(function(d) { return d.id; });
+
+  // svg.append("defs").selectAll("marker")
+  //   .data(["suit", "licensing", "resolved"])
+  // .enter().append("marker")
+  //   .attr("id", function(d) { return d; })
+  //   .attr("viewBox", "0 -5 10 10")
+  //   .attr("refX", 25)
+  //   .attr("refY", 0)
+  //   .attr("markerWidth", 6)
+  //   .attr("markerHeight", 6)
+  //   .attr("orient", "auto")
+  // .append("path")
+  //   .attr("d", "M0,-5L10,0L0,5 L10,0 L0, -5")
+  //   .style("stroke", "#4679BD")
+  //   .style("opacity", "0.6");
 
   simulation
       .nodes(graph.nodes)
@@ -54,6 +73,13 @@ d3.json("./public/javascripts/datasets/data.json", function(error, graph) {
   }
 });
 
+function showConnection (d) {
+  const caption = document.querySelector('.caption');
+  const event = d3.event;
+
+  caption.innerHTML = `${d.source.id} gave $${d.value} to ${d.target.id}`
+}
+
 function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
@@ -69,4 +95,12 @@ function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
   d.fx = null;
   d.fy = null;
+}
+
+function showNode (d) {
+  document.querySelector('.caption').innerHTML = `${d.id}`
+}
+
+function hideCaption (d) {
+  document.querySelector('.caption').innerHTML = '';
 }
