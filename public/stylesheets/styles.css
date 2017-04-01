@@ -23,11 +23,15 @@ html, body {
   margin-top: 0;
   padding-top: 20px;
   margin-bottom: 2px;
+  position: relative;
+  z-index: 10;
 }
 
 .subtitle {
   margin-top: 0;
   color: #aaa;
+  position: relative;
+  z-index: 10;
 }
 
 .label {
@@ -83,4 +87,17 @@ svg {
   position: fixed;
   bottom: 50px;
   color: #aaa;
+  padding: 15px;
+}
+
+.overlay {
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.name, .money {
+  color: #444;
+}
+
+select {
+  max-width: 150px;
 }
